@@ -170,7 +170,7 @@
     const banners = [];
     if (e.status === 'Waiting for approval') banners.push(`<div class="banner warn" role="status"><b>Waiting for ${D.checker.short} to approve.</b><span>Releases over ${naira(D.thresholds.approvalOver)} need a second person. No money moves and nothing goes to Ebun until then.</span>
       <div class="row"><button class="btn sm pri" data-act="approve">Demo: approve as ${D.checker.short}</button><button class="btn sm" data-act="sendback">Demo: send back</button></div></div>`);
-    if (e.status === 'Closed') banners.push(`<div class="banner ok" role="status"><b>Closed as a false positive. ${naira(ebunHeld())} released${e.partReleased ? `, after ${naira(OTHER)} earlier` : ''}.</b><span>Approved by ${D.checker.name}. Arrives ${C.arrives}.${e.heldInError ? ` The reason went to the owners of rule ${RULE('amount').id} and auto-review.` : ''}</span><div class="msg"><small style="color:var(--ink-3)">What Ebun was told</small><br>${esc(e.message)}</div></div>`);
+    if (e.status === 'Closed') banners.push(`<div class="stat sm res" role="status"><div class="l">Resolution</div><div class="v">False positive</div><div class="n">${naira(ebunHeld())} released${e.partReleased ? ` · ${naira(OTHER)} earlier` : ''} · Arrives ${C.arrives}</div><div class="n">Approved by ${D.checker.name}</div><div class="told"><div class="l">What Ebun was told</div><div class="tm">${esc(e.message)}</div></div></div>`);
     if (e.status === 'Escalated') banners.push(`<div class="banner warn" role="status"><b>With the ${esc(e.team)} team.</b><span>The hold stays. Ebun was told: “${esc(MSG.review())}”</span></div>`);
     if (e.status === 'Waiting on merchant') banners.push(`<div class="banner info" role="status"><b>Waiting for Ebun until ${e.asked.by}.</b><span>Asked for ${joinItems(e.asked.items)}.${e.asked.reminder ? ` A reminder goes out ${e.asked.reminder}.` : ''}</span><div class="row"><button class="btn sm" data-act="docsin">Demo: Ebun sends the documents</button></div></div>`);
     if (e.status === 'Documents received') banners.push(`<div class="banner info" role="status"><b>Ebun sent ${E.proof.length} documents.</b>${E.proof.map(p => `<span>${esc(p.kind)}: ${esc(p.detail)}</span>`).join('')}</div>`);
@@ -188,7 +188,7 @@
     return `${banners.join('')}
       <div class="facts">
         <div class="stat sm wide"><div class="l">Payout held</div><div class="v">${naira(ebunHeld())}</div><div class="n">Flagged payment ${naira(FLAGGED)} · Card · ${E.flagged.when}${e.partReleased ? ` · ${naira(OTHER)} released` : ''}</div></div>
-        <div class="stat sm"><div class="l">Severity</div><div class="v High">${sev(P.severity)}</div><div class="n">Due in ${P.dueIn} · payout a day late</div></div>
+        <div class="stat sm"><div class="l">Severity</div><div class="v High">${sev(P.severity)}</div><div class="n">${e.status === 'Closed' ? 'Resolved' : `Due in ${P.dueIn} · payout a day late`}</div></div>
         <div class="stat sm"><div class="l">Assignee</div><div class="v">${esc(e.assignee || 'Unassigned')}</div>${!e.assignee ? '<button class="link" data-act="assign" style="font-size:13px">Assign to me</button>' : `<div class="n">Since ${C.tookCase.split(', ')[1]}</div>`}</div>
       </div>
       <div class="sec"><div class="sec-h"><h3>Who is involved</h3></div><div class="list">

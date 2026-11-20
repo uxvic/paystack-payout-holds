@@ -217,3 +217,5 @@ textarea { min-height: 84px; resize: vertical; }
   .search { width: 100%; }
   .pane { left: 8px; right: 8px; width: auto; }
 }
+.res .told { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.res .told .tm { margin-top: 4px; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
