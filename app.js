@@ -66,11 +66,11 @@
     return [e, ...D.others.map(o => ({ id: o.id, name: o.name, severity: o.severity, dueIn: o.dueIn, held: o.held, rule: o.rule, created: o.created, status: o.status, assignee: o.assignee }))];
   }
   const isOpen = c => c.status !== 'Closed';
-  const rank = c => SEV.indexOf(c.severity) * 1e7 + (c.status === 'Waiting on merchant' ? 5e6 : 0) + Math.min(toMin(c.dueIn), 99999) * 10 + created(c.created) / 1e4;
+  const rank = c => (c.status === 'Closed' ? 9e7 : 0) + SEV.indexOf(c.severity) * 1e7 + (c.status === 'Waiting on merchant' ? 5e6 : 0) + Math.min(toMin(c.dueIn), 99999) * 10 + created(c.created) / 1e4;
   function visibleCases(only) {
     let list = allCases();
     if (only === 'escalated') list = list.filter(c => c.status === 'Escalated');
-    else if (S.filterOpen) list = list.filter(isOpen);
+    else if (S.filterOpen) list = list.filter(c => isOpen(c) || c.status === 'Closed');
     if (S.q.trim()) { const q = S.q.trim().toLowerCase(); list = list.filter(c => (c.name + ' ' + (c.id === 'ebun' ? E.id : '') + ' ' + RULE(c.rule).id).toLowerCase().includes(q)); }
     return list.sort((a, b) => rank(a) - rank(b));
   }
@@ -108,7 +108,7 @@
     const list = visibleCases(only);
     const full = !pane;
     const rows = list.map(k => `<tr class="click" data-act="open" data-v="${k.id}" tabindex="0" aria-selected="${S.sel === k.id}">
-      <td>${sev(k.severity)}<span class="due">${k.dueIn || '—'}</span></td>
+      <td>${sev(k.severity)}<span class="due">${k.status === 'Closed' ? 'Resolved' : (k.dueIn || '—')}</span></td>
       <td>${esc(k.name)}</td>
       <td class="r">${naira(k.held)}</td>
       ${full ? `<td class="trunc">${RULE(k.rule).id} ${esc(RULE(k.rule).name)}</td><td class="muted">${k.created}</td>` : ''}
@@ -123,15 +123,14 @@
       <section class="tcard" aria-label="Cases">
         <div class="tbar"><h2>Cases</h2>
           <button class="chip dash" data-act="toast" data-v="Filters by severity, rule, amount and assignee would sit here.">${ic('plus', 14)}Add filter</button>
-          ${S.filterOpen && only !== 'escalated' ? `<button class="chip" data-act="clearfilter" aria-label="Remove filter: status is open"><span class="k">Status is</span> Open ${ic('x', 14)}</button>` : ''}
+          ${S.filterOpen && only !== 'escalated' ? `<button class="chip" data-act="clearfilter" aria-label="Remove filter: status is open"><span class="k">Status is</span> Open, resolved today ${ic('x', 14)}</button>` : ''}
           <span class="sp"></span>
           <label class="search">${ic('search', 16)}<span class="sr" style="position:absolute;left:-9999px">Search</span><input id="q" type="search" placeholder="Search business or case ID" value="${esc(S.q)}" data-act="search"></label>
         </div>
         <div class="twrap" style="position:relative">${list.length ? `<table>
           <thead><tr><th>Severity / due in</th><th>Business</th><th class="r">Amount</th>${full ? '<th>Case type</th><th>Created on</th>' : ''}<th>Status</th><th>Assignee</th><th><span style="position:absolute;left:-9999px">Actions</span></th></tr></thead>
           <tbody>${rows}</tbody></table>${menu}` : `<p class="empty">No cases match.</p>`}</div>
-        <div class="tfoot"><span>Showing ${list.length} of ${list.length} ${S.filterOpen && only !== 'escalated' ? 'open ' : ''}cases.</span><span class="sp"></span><button class="btn sm" disabled>Previous</button><button class="btn sm" disabled>Next</button></div>
-        <div class="legend" aria-label="What severity means">${D.severityRule.map(([l, t]) => `<span><b>${l}:</b> ${t.toLowerCase()}</span>`).join('')}<span>Inside a level: soonest due first. Cases waiting on the business go last.</span></div>
+        <div class="tfoot"><span>Showing ${list.length} ${list.length === 1 ? 'case' : 'cases'}${list.some(c => c.status === 'Closed') ? `: ${list.filter(isOpen).length} open, ${list.filter(c => c.status === 'Closed').length} resolved today` : ''}.</span><span class="sp"></span><button class="btn sm" disabled>Previous</button><button class="btn sm" disabled>Next</button></div>
       </section>
     </main>${pane ? casePane() : ''}`;
   }
@@ -150,16 +149,17 @@
     const isE = id === 'ebun';
     const tabs = ['overview', 'transactions', 'accounts', 'activity'];
     const tabNames = { overview: 'Overview', transactions: 'Transactions', accounts: 'Accounts', activity: 'Activity' };
-    const body = !isE && S.tab !== 'overview' ? `<p class="empty">Only Ebun Furniture Studio's case is filled in for this prototype.</p>`
+    const o = !isE ? D.others.find(c => c.id === id) : null, d = o ? D.details[id] : null;
+    const body = !isE ? { overview: oOverview, transactions: oTransactions, accounts: oAccounts, activity: oActivity }[S.tab](o, d)
       : { overview: overview, transactions: transactions, accounts: accounts, activity: activity }[S.tab](k);
     const st = isE ? x().status : k.status;
     const canAct = isE && ['New', 'In review', 'Waiting on merchant', 'Documents received'].includes(st);
     return `<aside class="sheet pane" aria-label="Case ${esc(k.name)}" style="${S.wide ? 'width:auto;flex:1' : ''}">
-      <div class="pane-head"><h2>${esc(k.name)}</h2>${isE ? `<span class="id">${E.id}</span>` : ''}${badge(st)}<span class="sp"></span>
+      <div class="pane-head"><h2>${esc(k.name)}</h2><span class="id">${isE ? E.id : d.caseId}</span>${badge(st)}<span class="sp"></span>
         <button class="iconbtn" data-act="closepane" aria-label="Close case">${ic('x')}</button></div>
       <div class="tabs" role="tablist">${tabs.map(t => `<button role="tab" id="tab-${t}" aria-selected="${S.tab === t}" data-act="tab" data-v="${t}">${tabNames[t]}</button>`).join('')}</div>
       <div class="pane-body" role="tabpanel" aria-labelledby="tab-${S.tab}">${body}</div>
-      ${canAct ? `<div class="pane-foot"><button class="btn pri" data-act="modal" data-v="resolve">Resolve</button><button class="btn" data-act="modal" data-v="escalate">Escalate</button><button class="btn" data-act="modal" data-v="ask" ${st === 'Waiting on merchant' ? 'disabled' : ''}>Request info</button><span class="sp"></span><button class="link" data-act="wide">${S.wide ? 'Back to list' : 'View case'}</button></div>` : ''}
+      ${canAct ? `<div class="pane-foot"><button class="btn pri" data-act="modal" data-v="resolve">Resolve</button><button class="btn" data-act="modal" data-v="escalate">Escalate</button><button class="btn" data-act="modal" data-v="ask" ${st === 'Waiting on merchant' ? 'disabled' : ''}>Request info</button><span class="sp"></span><button class="link" data-act="wide">${S.wide ? 'Back to list' : 'View case'}</button></div>` : !isE ? `<div class="pane-foot"><span style="color:var(--ink-3);font-size:13px">${esc(d.foot)}</span><span class="sp"></span><button class="link" data-act="wide">${S.wide ? 'Back to list' : 'View case'}</button></div>` : ''}
     </aside>`;
   }
   function overview(k) {
@@ -200,6 +200,47 @@
         ${S.details ? `<div class="list checks">${checks.map(c => `<div class="lrow"><span class="dot ${c[2]}" title="${lean[c[2]]}"></span><div class="grow"><b>${c[0]}</b><small>${esc(c[1])}</small><span style="position:absolute;left:-9999px">${lean[c[2]]}</span></div></div>`).join('')}</div>` : ''}
         <button class="link" data-act="details">${S.details ? 'Hide case details' : 'View case details'}</button></div>`;
   }
+  // ---------- Every other case: the same four tabs, read from D.details ----------
+  const LEAN = { real: 'Points to a real order', risk: 'Points to risk', both: 'Both ways' };
+  const checkList = checks => `<div class="list checks">${checks.map(c => `<div class="lrow"><span class="dot ${c[2]}" title="${LEAN[c[2]]}"></span><div class="grow"><b>${c[0]}</b><small>${esc(c[1])}</small><span style="position:absolute;left:-9999px">${LEAN[c[2]]}</span></div></div>`).join('')}</div>`;
+  const payRow = p => `<div class="lrow"><div class="grow"><b>${esc(p.who)}</b><small>${esc(p.via)}</small></div><div class="amt"><b>${naira(p.amount)}</b><small>${p.when}</small></div>${p.flagged ? '<span class="badge b-warn">Flagged</span>' : ''}</div>`;
+  function oOverview(o, d) {
+    const r = d.resolution;
+    const res = r ? `<div class="stat sm res" role="status"><div class="l">Resolution</div><div class="v">${esc(r.outcome)}</div><div class="n">${esc(r.line1)}</div><div class="n">${esc(r.line2)}</div><div class="told"><div class="l">Reason</div><div class="tm">${esc(r.reason)}</div></div><div class="told"><div class="l">What ${esc(o.name)} was told</div><div class="tm">${esc(r.message)}</div></div></div>` : '';
+    const note = o.status === 'Closed' ? 'Resolved' : o.dueIn ? `Due in ${o.dueIn}` : 'Deadline set by the team';
+    return `${res}<div class="facts">
+        <div class="stat sm wide"><div class="l">Payout held</div><div class="v">${naira(o.held)}</div><div class="n">${esc(d.flaggedNote)}</div></div>
+        <div class="stat sm"><div class="l">Severity</div><div class="v ${o.severity}">${sev(o.severity)}</div><div class="n">${note}</div></div>
+        <div class="stat sm"><div class="l">Assignee</div><div class="v">${esc(o.assignee || 'Unassigned')}</div>${d.since ? `<div class="n">${esc(d.since)}</div>` : ''}</div>
+      </div>
+      <div class="sec"><div class="sec-h"><h3>Who is involved</h3></div><div class="list">
+        <div class="lrow"><span class="ico">${ic('bank', 16)}</span><div class="grow"><small>Receiver</small><b>${esc(o.name)}</b></div></div>
+        <div class="lrow"><span class="ico">${ic('bank', 16)}</span><div class="grow"><small>Sender</small><b>${esc(d.sender)}</b></div></div>
+        <div class="lrow"><span class="ico">${ic('shield', 16)}</span><div class="grow"><small>Flagged rule</small><b>${RULE(o.rule).id} · ${esc(RULE(o.rule).name)}</b></div></div>
+      </div></div>
+      <div class="sec"><div class="sec-h"><h3>Checks</h3></div>${S.details ? checkList(d.checks) : ''}
+        <button class="link" data-act="details">${S.details ? 'Hide case details' : 'View case details'}</button></div>`;
+  }
+  function oTransactions(o, d) {
+    return `<div class="sec"><div class="sec-h"><h3>Recent transactions</h3><span class="sp"></span><span class="meta">In the payout due ${d.payoutDue}</span></div><div class="list">
+        <div class="lrow total"><div class="grow" style="color:var(--ink-3)">Total amount on hold</div><b>${naira(o.held)}</b></div>
+        ${d.payout.map(payRow).join('')}
+        ${d.clear ? `<div class="lrow total"><div class="grow"><b>${naira(d.clear.amount)} is not in question</b><small>${esc(d.clear.label)}</small></div></div>` : ''}
+      </div></div>
+      <div class="sec"><div class="sec-h"><h3>Earlier between these two</h3></div>${d.earlier.length ? `<div class="list">${d.earlier.map(payRow).join('')}</div>` : '<p style="color:var(--ink-3);font-size:13px">No earlier payments between them.</p>'}</div>
+      <div class="sec"><div class="sec-h"><h3>Their usual pattern</h3></div><div class="facts" style="grid-template-columns:repeat(3,1fr)">
+        ${d.pattern.map(([l, v]) => `<div class="stat sm"><div class="l">${esc(l)}</div><div class="v" style="font-size:15px">${esc(v)}</div></div>`).join('')}</div></div>`;
+  }
+  function oAccounts(o, d) {
+    const onHold = o.status === 'Closed' ? ['Released', 'b-ok'] : ['On hold now', 'b-warn'];
+    return `<div class="sec"><div class="sec-h"><h3>Business</h3><span class="sp"></span><span class="badge ${onHold[1]}">${onHold[0]}</span></div>${kv(d.business)}</div>
+      <div class="sec"><div class="sec-h"><h3>${esc(d.partyTitle)}</h3><span class="sp"></span><span class="badge ${d.partyBadge[1]}">${esc(d.partyBadge[0])}</span></div>${kv(d.party)}</div>`;
+  }
+  function oActivity(o, d) {
+    const ev = d.activity;
+    return `<div class="sec"><div class="sec-h"><h3>Timeline</h3></div><div class="tl">${ev.map((e, i) => `<div class="ev ${i === ev.length - 1 ? 'now' : ''}"><div class="rail"><i></i><span></span></div><div class="txt"><b>${esc(e[0])}</b><small>${esc(e[1])}</small><p>${esc(e[2])}</p></div></div>`).join('')}</div></div>`;
+  }
+
   function transactions() {
     const e = x(), canRelease = !e.partReleased && ['New', 'In review', 'Waiting on merchant', 'Documents received'].includes(e.status);
     const row = p => `<div class="lrow"><div class="grow"><b>${esc(p.who)}</b><small>${esc(p.via)}</small></div><div class="amt"><b>${naira(p.amount)}</b><small>${p.when}</small></div>${p.flagged ? '<span class="badge b-warn">Flagged</span>' : ''}</div>`;

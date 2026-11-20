@@ -148,7 +148,278 @@ window.DATA = {
       rule: "amount", severity: "Medium", dueIn: "8h 30m", created: "Wed 18 Nov, 06:00", assignee: null, status: "New", heldOn: "Wed 18 Nov" },
     { id: "bakery", name: "Sweet Crumb Bakery", held: 96500, late: "2 working days", weeksOfTakings: 1, support: 1,
       rule: "newBiz", severity: "High", dueIn: "1d 6h", created: "Mon 16 Nov, 06:30", assignee: "Ife O.", status: "Waiting on merchant", heldOn: "Mon 16 Nov" }
+    ,
+    { id: "kola", name: "Kola Shoes", held: 450000, late: "Due today", rule: "disputes", severity: "Medium", dueIn: null,
+      created: "Wed 18 Nov, 06:10", assignee: "Ife O.", status: "Closed", heldOn: "Wed 18 Nov" }
   ],
+
+  // Full case detail for every case other than Ebun's (fictional). Payments in each payout add up to "held".
+  details: {
+    gadget: {
+      caseId: "H-48216", sender: "41 card holders in 9 countries", since: "Since 09:20", payoutDue: "Wed 18 Nov",
+      flaggedNote: "41 card payments from abroad, NGN 574,000.00 · Wed 18 Nov, 07:05 to 09:05",
+      payout: [
+        { who: "41 card payments", via: "Cards issued in 9 countries", amount: 574000, when: "Wed 18 Nov, 07:05 to 09:05", flagged: true },
+        { who: "Kunle Adebayo", via: "Card •••• 3381", amount: 15000, when: "Tue 17 Nov, 18:20" },
+        { who: "Bisi Lawal", via: "Transfer", amount: 12500, when: "Tue 17 Nov, 19:02" },
+        { who: "Emeka Nwosu", via: "Card •••• 9045", amount: 10500, when: "Wed 18 Nov, 06:40" }
+      ],
+      clear: { amount: 38000, label: "3 payments from regular buyers" }, earlier: [],
+      pattern: [["Payments a month", "22"], ["Median", "NGN 14,000.00"], ["Largest by card", "NGN 45,000.00"]],
+      checks: [
+        ["Who paid", "41 cards issued in 9 countries; 29 skipped or failed 3-D Secure", "risk"],
+        ["Payer's history here", "None of the 41 cards has paid this business before", "risk"],
+        ["Against their pattern", "41 payments in 2 hours; they usually take 22 a month", "risk"],
+        ["KYC and limits", "Starter business, limit NGN 1,000,000.00 per payment", "real"],
+        ["Restrictions and fraud", "6 of the cards are on a fraud blocklist", "risk"],
+        ["Can it be reversed", "Card payments: can be disputed after payout", "risk"],
+        ["Fits the business", "Phone cases at NGN 14,000, the price on their payment page", "both"],
+        ["Delivery", "No orders shipped yet", "risk"]
+      ],
+      business: [
+        ["Name", "Gadget Corner", "Yaba, Lagos · 8 months on Paystack"], ["Verification", "Starter business", "BVN verified Mar 2026"],
+        ["Limit", "NGN 1,000,000.00 per payment"], ["Restrictions before", "None in 8 months"], ["Past holds", "None"],
+        ["Disputes, 90 days", "0 of 64 payments"], ["Refunds, 90 days", "1"], ["Sanctions and PEP", "Clear", "Screened daily"],
+        ["Linked accounts", "None", "Same owner, device or bank account"], ["Payout account", "•••• 2210", "Unchanged since Mar 2026"],
+        ["Contact", "None", "No calls about this payout"]
+      ],
+      partyTitle: "Payers", partyBadge: ["6 cards blocklisted", "b-bad"],
+      party: [
+        ["Who", "41 card holders", "Paying by card from abroad"], ["Cards", "Issued in 9 countries", "29 skipped or failed 3-D Secure"],
+        ["On Paystack", "38 of 41 cards never seen before"], ["Restrictions and blocklists", "6 cards on a fraud blocklist"],
+        ["Disputes and chargebacks", "None yet"], ["Sanctions and PEP", "No match"]
+      ],
+      activity: [
+        ["System", "Wed 18 Nov, 07:05", "First of 41 payments from cards issued abroad"],
+        ["Rule R-03", "Wed 18 Nov, 09:12", "Held the payout of NGN 612,000.00"],
+        ["Auto-review", "Wed 18 Nov, 09:12", "R-03 is never cleared automatically. Passed to analysts as urgent"],
+        ["Kemi O.", "Wed 18 Nov, 09:20", "Took the case"],
+        ["Kemi O.", "Wed 18 Nov, 09:26", "Note: payments still arriving. Looks like stolen cards being tested"]
+      ],
+      foot: "Kemi O. is working this case."
+    },
+    northgate: {
+      caseId: "H-48205", sender: "Meridian Cargo Holdings", since: "Since 07:40", payoutDue: "Wed 18 Nov",
+      flaggedNote: "Flagged NGN 1,800,000.00 · Transfer · Tue 17 Nov, 16:40",
+      payout: [
+        { who: "Meridian Cargo Holdings", via: "Transfer", amount: 1800000, when: "Tue 17 Nov, 16:40", flagged: true },
+        { who: "Ola Haulage Services", via: "Transfer", amount: 250000, when: "Tue 17 Nov, 11:15" },
+        { who: "Dutse Agro Ltd", via: "Card •••• 7731", amount: 200000, when: "Tue 17 Nov, 13:50" }
+      ],
+      clear: { amount: 450000, label: "2 payments from regular customers · held until compliance decides" }, earlier: [],
+      pattern: [["Payments a month", "26"], ["Median", "NGN 310,000.00"], ["Largest payment", "NGN 1,900,000.00"]],
+      checks: [
+        ["Who paid", "Meridian Cargo Holdings: name close to an entry on a sanctions list", "risk"],
+        ["Payer's history here", "First payment from this payer", "risk"],
+        ["Against their pattern", "Within their usual range for freight jobs", "real"],
+        ["KYC and limits", "Registered business, limit NGN 5,000,000.00 per payment", "real"],
+        ["Restrictions and fraud", "None in 3 years", "real"],
+        ["Can it be reversed", "Transfer: cannot be charged back", "real"],
+        ["Fits the business", "Invoice for a Lagos to Kano freight run", "real"],
+        ["Delivery", "Not checked: compliance decides", "both"]
+      ],
+      business: [
+        ["Name", "Northgate Freight", "Apapa, Lagos · 3 years on Paystack"], ["Verification", "Registered business", "Verified Jan 2024"],
+        ["Limit", "NGN 5,000,000.00 per payment"], ["Restrictions before", "None in 3 years"], ["Past holds", "1, cleared in Jun 2025"],
+        ["Disputes, 90 days", "0 of 78 payments"], ["Refunds, 90 days", "0"], ["Sanctions and PEP", "Clear", "Screened daily"],
+        ["Linked accounts", "None", "Same owner, device or bank account"], ["Payout account", "•••• 0937", "Unchanged since Jan 2024"],
+        ["Contact", "None", "No calls about this payout"]
+      ],
+      partyTitle: "Counterparty", partyBadge: ["Possible sanctions match", "b-bad"],
+      party: [
+        ["Name", "Meridian Cargo Holdings", "Business, paying by transfer"], ["Sanctions and PEP", "Possible match", "Name close to a list entry; with compliance"],
+        ["On Paystack", "First seen Tue 17 Nov", "1 payment, to this business"], ["Disputes and chargebacks", "None"],
+        ["Restrictions and blocklists", "None"], ["With this business", "None before"]
+      ],
+      activity: [
+        ["System", "Tue 17 Nov, 16:40", "Transfer of NGN 1,800,000.00 received"],
+        ["Rule R-01", "Wed 18 Nov, 07:15", "Held the payout of NGN 2,250,000.00"],
+        ["Auto-review", "Wed 18 Nov, 07:15", "Sanctions matches are never cleared automatically. Sent to the compliance team"],
+        ["Compliance", "Wed 18 Nov, 07:40", "Took the case. Deadline set by the team"],
+        ["System", "Wed 18 Nov, 07:41", "Northgate was told: “Your payout is still under review. We'll contact you as soon as we have an update.”"]
+      ],
+      foot: "With the compliance team. Read-only for analysts."
+    },
+    harbour: {
+      caseId: "H-48209", sender: "6 new payers", since: "Since 08:55", payoutDue: "Wed 18 Nov",
+      flaggedNote: "Flagged NGN 720,000.00 · 6 transfers · Tue 17 Nov, 22:10 to 23:55",
+      payout: [
+        { who: "6 transfers from 6 new payers", via: "NGN 120,000.00 each, minutes apart", amount: 720000, when: "Tue 17 Nov, 22:10 to 23:55", flagged: true },
+        { who: "Hauwa Bello", via: "Card •••• 5520", amount: 95000, when: "Tue 17 Nov, 12:30" },
+        { who: "Musa Ibrahim", via: "Transfer", amount: 125000, when: "Tue 17 Nov, 15:05" }
+      ],
+      clear: { amount: 220000, label: "2 payments from regular customers · held until financial crime decides" }, earlier: [],
+      pattern: [["Payments a month", "31"], ["Median", "NGN 85,000.00"], ["Largest payment", "NGN 400,000.00"]],
+      checks: [
+        ["Who paid", "6 payers, all with bank accounts opened this month", "risk"],
+        ["Payer's history here", "None of the 6 has paid this business before", "risk"],
+        ["Against their pattern", "Same amount, minutes apart, late at night", "risk"],
+        ["KYC and limits", "Registered business, limit NGN 2,000,000.00 per payment", "real"],
+        ["Restrictions and fraud", "None in 11 months", "real"],
+        ["Can it be reversed", "Transfers: cannot be charged back", "both"],
+        ["Fits the business", "No invoices match these payments", "risk"],
+        ["Delivery", "Not checked: financial crime decides", "both"]
+      ],
+      business: [
+        ["Name", "Harbour Goods Ltd", "Kano · 11 months on Paystack"], ["Verification", "Registered business", "Verified Dec 2025"],
+        ["Limit", "NGN 2,000,000.00 per payment"], ["Restrictions before", "None in 11 months"], ["Past holds", "None"],
+        ["Disputes, 90 days", "0 of 92 payments"], ["Refunds, 90 days", "0"], ["Sanctions and PEP", "Clear", "Screened daily"],
+        ["Linked accounts", "2", "Same device as two other businesses"], ["Payout account", "•••• 6614", "Unchanged since Dec 2025"],
+        ["Contact", "None", "No calls about this payout"]
+      ],
+      partyTitle: "Payers", partyBadge: ["Pattern match", "b-bad"],
+      party: [
+        ["Who", "6 individuals", "Paying by bank transfer"], ["Bank accounts", "Opened in Nov 2026", "All 6 within 2 weeks"],
+        ["On Paystack", "First seen Tue 17 Nov"], ["Pattern", "Matches a known typology", "From official guidance"],
+        ["Restrictions and blocklists", "None"], ["Sanctions and PEP", "No match"]
+      ],
+      activity: [
+        ["System", "Tue 17 Nov, 22:10", "First of 6 transfers of NGN 120,000.00"],
+        ["Rule R-02", "Wed 18 Nov, 08:40", "Held the payout of NGN 940,000.00"],
+        ["Auto-review", "Wed 18 Nov, 08:40", "Never cleared automatically. Sent to the financial crime team"],
+        ["Financial crime", "Wed 18 Nov, 08:55", "Took the case. Deadline set by the team"],
+        ["System", "Wed 18 Nov, 08:56", "Harbour Goods was told: “Your payout is still under review. We'll contact you as soon as we have an update.”"]
+      ],
+      foot: "With the financial crime team. Read-only for analysts."
+    },
+    bakery: {
+      caseId: "H-48197", sender: "5 customers", since: "Since Mon 16 Nov, 10:15", payoutDue: "Mon 16 Nov",
+      flaggedNote: "First payout · 5 payments · Sun 15 Nov",
+      payout: [
+        { who: "Tade Ventures", via: "Transfer · office lunch order", amount: 42500, when: "Sun 15 Nov, 12:10" },
+        { who: "Funke Adeyinka", via: "Card •••• 4102", amount: 18000, when: "Sun 15 Nov, 09:40" },
+        { who: "Dami Olatunji", via: "Transfer", amount: 14500, when: "Sun 15 Nov, 15:25" },
+        { who: "Ijeoma Nnadi", via: "Card •••• 7718", amount: 12000, when: "Sun 15 Nov, 10:05" },
+        { who: "Seun Bello", via: "Card •••• 0921", amount: 9500, when: "Sun 15 Nov, 17:50" }
+      ],
+      clear: null, earlier: [],
+      pattern: [["Payments so far", "5"], ["On Paystack", "3 weeks"], ["Largest payment", "NGN 42,500.00"]],
+      checks: [
+        ["Who paid", "5 local customers; cards passed 3-D Secure", "real"],
+        ["Payer's history here", "New business: no history yet", "both"],
+        ["Against their pattern", "First payout: no pattern yet", "both"],
+        ["KYC and limits", "Starter business, limit NGN 200,000.00 per payment", "real"],
+        ["Restrictions and fraud", "None", "real"],
+        ["Can it be reversed", "3 card payments can be disputed after payout", "risk"],
+        ["Fits the business", "Cakes and lunch orders at the prices on their page", "real"],
+        ["Delivery", "Asked for receipts for the 2 largest orders", "both"]
+      ],
+      business: [
+        ["Name", "Sweet Crumb Bakery", "Surulere, Lagos · 3 weeks on Paystack"], ["Verification", "Starter business", "BVN verified Oct 2026"],
+        ["Limit", "NGN 200,000.00 per payment"], ["Restrictions before", "None"], ["Past holds", "None: this is their first payout"],
+        ["Disputes", "None yet"], ["Refunds", "None yet"], ["Sanctions and PEP", "Clear", "Screened daily"],
+        ["Linked accounts", "None", "Same owner, device or bank account"], ["Payout account", "•••• 5512", "Set Oct 2026"],
+        ["Contact", "Called support 1 time", "About this payout"]
+      ],
+      partyTitle: "Customers", partyBadge: ["No restrictions", "b-ok"],
+      party: [
+        ["Who", "5 customers", "3 by card, 2 by transfer"], ["Cards", "Issued in Nigeria", "3-D Secure passed"],
+        ["On Paystack", "All seen before", "At other businesses"], ["Disputes and chargebacks", "None"],
+        ["Restrictions and blocklists", "None"], ["Sanctions and PEP", "No match"]
+      ],
+      activity: [
+        ["Rule R-11", "Mon 16 Nov, 06:30", "Held the first payout of NGN 96,500.00"],
+        ["Auto-review", "Mon 16 Nov, 06:30", "Couldn't clear it: a new business with no track record. Passed to analysts"],
+        ["Ife O.", "Mon 16 Nov, 10:15", "Took the case"],
+        ["Ife O.", "Mon 16 Nov, 10:22", "Asked for receipts for the 2 largest orders, by Thu 19 Nov"],
+        ["Support", "Tue 17 Nov, 14:05", "Sweet Crumb called about the payout"],
+        ["System", "Wed 18 Nov, 09:30", "Waiting on the business, so it sits at the bottom of High"]
+      ],
+      foot: "Waiting on Sweet Crumb until Thu 19 Nov."
+    },
+    bolu: {
+      caseId: "H-48211", sender: "Lekki Events Co", since: null, payoutDue: "Wed 18 Nov",
+      flaggedNote: "Flagged NGN 300,000.00 · Card · Tue 17 Nov, 15:30",
+      payout: [
+        { who: "Lekki Events Co", via: "Card •••• 6620", amount: 300000, when: "Tue 17 Nov, 15:30", flagged: true },
+        { who: "Ada Nwosu", via: "Card •••• 1187", amount: 25000, when: "Tue 17 Nov, 10:15" },
+        { who: "Kayode Ajayi", via: "Transfer", amount: 30000, when: "Tue 17 Nov, 12:40" },
+        { who: "Rita Okon", via: "Card •••• 5034", amount: 25000, when: "Tue 17 Nov, 17:05" }
+      ],
+      clear: { amount: 80000, label: "3 payments from regular buyers" }, earlier: [],
+      pattern: [["Payments a month", "45"], ["Median", "NGN 18,000.00"], ["Largest by card", "NGN 50,000.00"]],
+      checks: [
+        ["Who paid", "Lekki Events Co, card issued in Nigeria, 3-D Secure passed", "real"],
+        ["Payer's history here", "First payment from this payer", "both"],
+        ["Against their pattern", "6 times their largest card payment (NGN 50,000.00)", "risk"],
+        ["KYC and limits", "Registered business, limit NGN 5,000,000.00 per payment", "real"],
+        ["Restrictions and fraud", "None in 2 years", "real"],
+        ["Can it be reversed", "Card payment: can be disputed after payout", "risk"],
+        ["Fits the business", "500 event banners at NGN 600, the price on their payment page", "real"],
+        ["Delivery", "Not known yet", "both"]
+      ],
+      business: [
+        ["Name", "Bolu Prints", "Ikeja, Lagos · 2 years on Paystack"], ["Verification", "Registered business", "Verified Feb 2025"],
+        ["Limit", "NGN 5,000,000.00 per payment"], ["Restrictions before", "None in 2 years"], ["Past holds", "None"],
+        ["Disputes, 90 days", "0 of 135 payments"], ["Refunds, 90 days", "1"], ["Sanctions and PEP", "Clear", "Screened daily"],
+        ["Linked accounts", "None", "Same owner, device or bank account"], ["Payout account", "•••• 3308", "Unchanged since Feb 2025"],
+        ["Contact", "None", "No calls about this payout"]
+      ],
+      partyTitle: "Counterparty", partyBadge: ["No restrictions", "b-ok"],
+      party: [
+        ["Name", "Lekki Events Co", "Business, paying by corporate card"], ["Card", "Issued in Nigeria", "3-D Secure passed"],
+        ["On Paystack", "Card first seen Jun 2026", "6 payments to 4 businesses"], ["Disputes and chargebacks", "None"],
+        ["Restrictions and blocklists", "None"], ["Sanctions and PEP", "No match"], ["With this business", "None before"]
+      ],
+      activity: [
+        ["System", "Tue 17 Nov, 15:30", "Payment of NGN 300,000.00 received by card"],
+        ["Rule R-07", "Wed 18 Nov, 06:00", "Held the payout of NGN 380,000.00"],
+        ["Auto-review", "Wed 18 Nov, 06:00", "Couldn't clear it: first payment from this payer, far above their card payments. Passed to analysts"],
+        ["System", "Wed 18 Nov, 09:30", "Waiting for an analyst. Medium: the payout is due today"]
+      ],
+      foot: "In this prototype, only Ebun's case can be resolved."
+    },
+    kola: {
+      caseId: "H-48210", sender: "4 customers", since: "Closed 08:20", payoutDue: "Wed 18 Nov",
+      flaggedNote: "Held for refunds: 12 refunds on Tue 17 Nov",
+      resolution: {
+        outcome: "False positive", line1: "NGN 450,000.00 released · Arrives Thu 19 Nov",
+        line2: "Closed by Ife O. at 08:20 · No second approval under NGN 2,000,000.00",
+        reason: "The business sent proof that explains the payment",
+        message: "Your payout of NGN 450,000.00 has been released and will reach your bank by Thu 19 Nov. Thank you for sending the documents."
+      },
+      payout: [
+        { who: "Shoe Palace Abuja", via: "Transfer · wholesale order", amount: 280000, when: "Tue 17 Nov, 11:00" },
+        { who: "Tobi Akande", via: "Card •••• 2245", amount: 65000, when: "Tue 17 Nov, 14:20" },
+        { who: "Grace Udo", via: "Card •••• 8830", amount: 55000, when: "Tue 17 Nov, 16:10" },
+        { who: "Yusuf Bala", via: "Transfer", amount: 50000, when: "Tue 17 Nov, 18:45" }
+      ],
+      clear: null, earlier: [],
+      pattern: [["Payments a month", "58"], ["Refunds a month", "2"], ["Refunds on Tue 17 Nov", "12"]],
+      checks: [
+        ["Who paid", "4 customers; cards passed 3-D Secure", "real"],
+        ["Payer's history here", "Shoe Palace Abuja has paid 6 times before", "real"],
+        ["Against their pattern", "12 refunds in one day; they usually make 2 a month", "risk"],
+        ["KYC and limits", "Registered business, limit NGN 5,000,000.00 per payment", "real"],
+        ["Restrictions and fraud", "None in 4 years", "real"],
+        ["Can it be reversed", "2 card payments can be disputed after payout", "risk"],
+        ["Fits the business", "Shoe orders at the prices on their page", "real"],
+        ["Delivery", "Proof: a supplier recall notice for 12 pairs, all refunded the same day", "real"]
+      ],
+      business: [
+        ["Name", "Kola Shoes", "Aba, Abia · 4 years on Paystack"], ["Verification", "Registered business", "Verified Apr 2022"],
+        ["Limit", "NGN 5,000,000.00 per payment"], ["Restrictions before", "None in 4 years"], ["Past holds", "None"],
+        ["Disputes, 90 days", "0 of 170 payments"], ["Refunds, 90 days", "18", "12 on Tue 17 Nov, a supplier recall"],
+        ["Sanctions and PEP", "Clear", "Screened daily"], ["Linked accounts", "None", "Same owner, device or bank account"],
+        ["Payout account", "•••• 7740", "Unchanged since Apr 2022"], ["Contact", "None", "No calls about this payout"]
+      ],
+      partyTitle: "Customers", partyBadge: ["No restrictions", "b-ok"],
+      party: [
+        ["Who", "4 customers", "2 by card, 2 by transfer"], ["Cards", "Issued in Nigeria", "3-D Secure passed"],
+        ["On Paystack", "All seen before"], ["Disputes and chargebacks", "None"],
+        ["Restrictions and blocklists", "None"], ["Sanctions and PEP", "No match"]
+      ],
+      activity: [
+        ["System", "Tue 17 Nov, 17:30", "12 refunds made in one afternoon"],
+        ["Rule R-05", "Wed 18 Nov, 06:10", "Held the payout of NGN 450,000.00"],
+        ["Auto-review", "Wed 18 Nov, 06:10", "Couldn't clear it: refunds far above normal. Passed to analysts"],
+        ["Ife O.", "Wed 18 Nov, 07:02", "Took the case and asked Kola Shoes why there were so many refunds"],
+        ["Kola Shoes", "Wed 18 Nov, 07:50", "Sent a supplier recall notice for 12 pairs"],
+        ["Ife O.", "Wed 18 Nov, 08:20", "Resolved as a false positive: the business sent proof that explains the payment. Released NGN 450,000.00"]
+      ],
+      foot: "Closed. Nothing more to do on this case."
+    }
+  },
 
   // Auto-review: every hold is checked by the system first (fictional numbers for the last 24 hours).
   autoReview: {
