@@ -109,7 +109,7 @@
     const list = visibleCases(only);
     const full = !pane;
     const rows = list.map(k => `<tr class="click" data-act="open" data-v="${k.id}" tabindex="0" aria-selected="${S.sel === k.id}">
-      <td>${sev(k.severity)}<span class="due">${k.status === 'Closed' ? 'Resolved' : (k.dueIn || '—')}</span></td>
+      <td><span class="sevcell">${sev(k.severity)}<span class="due">${k.status === 'Closed' ? 'Resolved' : (k.dueIn || '—')}</span></span></td>
       <td>${esc(k.name)}</td>
       <td class="r">${naira(k.held)}</td>
       ${full ? `<td class="trunc">${RULE(k.rule).id} ${esc(RULE(k.rule).name)}</td><td class="muted">${k.created}</td>` : ''}
