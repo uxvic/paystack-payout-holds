@@ -33,6 +33,7 @@
     cog: '<path d="M10.3 4.3a1.7 1.7 0 013.4 0 1.7 1.7 0 002.6 1.1 1.7 1.7 0 012.4 2.4 1.7 1.7 0 001.1 2.6 1.7 1.7 0 010 3.4 1.7 1.7 0 00-1.1 2.6 1.7 1.7 0 01-2.4 2.4 1.7 1.7 0 00-2.6 1.1 1.7 1.7 0 01-3.4 0 1.7 1.7 0 00-2.6-1.1 1.7 1.7 0 01-2.4-2.4 1.7 1.7 0 00-1.1-2.6 1.7 1.7 0 010-3.4 1.7 1.7 0 001.1-2.6 1.7 1.7 0 012.4-2.4 1.7 1.7 0 002.6-1.1z"/><circle cx="12" cy="12" r="3"/>',
     plus: '<path d="M12 5v14M5 12h14"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>', search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
     cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>', down: '<path d="M6 9l6 6 6-6"/>',
+    store: '<path d="M4 9l1.5-5h13L20 9M4 9h16M5 9v11h14V9M10 20v-5h4v5"/>', wallet: '<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18M15.5 15h2"/>', flag: '<path d="M5 21V4M5 4h12l-2.5 4.5L17 13H5"/>',
     bank: '<path d="M4 10h16M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18M12 4l8 4H4z"/>', more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
   };
   const ic = (n, s = 18) => `<svg class="i" viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true">${I[n]}</svg>`;
@@ -185,9 +186,9 @@
         <div class="stat sm"><div class="l">Assignee</div><div class="v">${esc(k.assignee || 'Unassigned')}</div>${!k.assignee ? '<button class="link" data-act="assign" style="font-size:13px">Assign to me</button>' : since ? `<div class="n">${esc(since)}</div>` : ''}</div>
       </div>
       <div class="sec"><div class="sec-h"><h3>Who is involved</h3></div><div class="list">
-        <div class="lrow"><span class="ico">${ic('bank', 16)}</span><div class="grow"><small>Receiver</small><b>${esc(info.name)}</b></div></div>
-        <div class="lrow"><span class="ico">${ic('bank', 16)}</span><div class="grow"><small>Sender</small><b>${esc(info.sender)}</b></div></div>
-        <div class="lrow"><span class="ico">${ic('bank', 16)}</span><div class="grow"><small>Flagged rule</small><b>${RULE(info.rule).id} · ${esc(RULE(info.rule).name)}</b></div></div>
+        <div class="lrow"><span class="ico">${ic('store', 18)}</span><div class="grow"><small>Receiver</small><b>${esc(info.name)}</b></div></div>
+        <div class="lrow"><span class="ico">${ic('wallet', 18)}</span><div class="grow"><small>Sender</small><b>${esc(info.sender)}</b></div></div>
+        <div class="lrow"><span class="ico">${ic('flag', 18)}</span><div class="grow"><small>Flagged rule</small><b>${RULE(info.rule).id} · ${esc(RULE(info.rule).name)}</b></div></div>
       </div></div>
       <button class="link" data-act="wide">${S.wide ? 'Back to list' : 'View case details'}</button>`;
   }
