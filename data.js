@@ -93,7 +93,6 @@ window.DATA = {
       ["Refunds, 90 days", "2"],
       ["Sanctions and PEP", "Clear", "Screened daily"],
       ["Linked accounts", "None", "Same owner, device or bank account"],
-      ["Payout account", "•••• 4821", "Unchanged since Sep 2025"],
       ["Contact", "Called support 2 times", "About this payout"]
     ],
     counterparty: [
@@ -102,8 +101,7 @@ window.DATA = {
       ["On Paystack", "Card first seen Mar 2025", "11 payments to 3 businesses"],
       ["Disputes and chargebacks", "None"],
       ["Restrictions and blocklists", "None"],
-      ["Sanctions and PEP", "No match"],
-      ["With this business", "1 earlier payment", "NGN 1,800,000.00 by transfer, Tue 11 Aug"]
+      ["Sanctions and PEP", "No match"]
     ],
     activity: [
       ["System", "Mon 16 Nov, 14:12", "Payment of NGN 3,600,000.00 received by card"],
@@ -157,9 +155,8 @@ window.DATA = {
   details: {
     gadget: {
       caseId: "H-48216", sender: "41 card holders in 9 countries", since: "Since 09:20", payoutDue: "Wed 18 Nov",
-      flaggedNote: "41 card payments from abroad, NGN 574,000.00 · Wed 18 Nov, 07:05 to 09:05",
+      flaggedNote: "Flagged NGN 574,000.00 · 41 cards from abroad · Wed 18 Nov, 07:05 to 09:05",
       payout: [
-        { who: "41 card payments", via: "Cards issued in 9 countries", amount: 574000, when: "Wed 18 Nov, 07:05 to 09:05", flagged: true },
         { who: "Kunle Adebayo", via: "Card •••• 3381", amount: 15000, when: "Tue 17 Nov, 18:20" },
         { who: "Bisi Lawal", via: "Transfer", amount: 12500, when: "Tue 17 Nov, 19:02" },
         { who: "Emeka Nwosu", via: "Card •••• 9045", amount: 10500, when: "Wed 18 Nov, 06:40" }
@@ -244,7 +241,12 @@ window.DATA = {
       caseId: "H-48209", sender: "6 new payers", since: "Since 08:55", payoutDue: "Wed 18 Nov",
       flaggedNote: "Flagged NGN 720,000.00 · 6 transfers · Tue 17 Nov, 22:10 to 23:55",
       payout: [
-        { who: "6 transfers from 6 new payers", via: "NGN 120,000.00 each, minutes apart", amount: 720000, when: "Tue 17 Nov, 22:10 to 23:55", flagged: true },
+        { who: "Aliyu Sule", via: "Transfer", amount: 120000, when: "Tue 17 Nov, 23:55" },
+        { who: "Yakubu Danjuma", via: "Transfer", amount: 120000, when: "Tue 17 Nov, 23:34" },
+        { who: "Ibrahim Musa", via: "Transfer", amount: 120000, when: "Tue 17 Nov, 23:13" },
+        { who: "Usman Ali", via: "Transfer", amount: 120000, when: "Tue 17 Nov, 22:52" },
+        { who: "Bello Garba", via: "Transfer", amount: 120000, when: "Tue 17 Nov, 22:31" },
+        { who: "Sani Adamu", via: "Transfer", amount: 120000, when: "Tue 17 Nov, 22:10" },
         { who: "Hauwa Bello", via: "Card •••• 5520", amount: 95000, when: "Tue 17 Nov, 12:30" },
         { who: "Musa Ibrahim", via: "Transfer", amount: 125000, when: "Tue 17 Nov, 15:05" }
       ],
@@ -448,3 +450,16 @@ window.DATA = {
     { rule: "request", holds: 0, autoCleared: 0, heldInError: 0 }
   ]
 };
+
+// Gadget Corner: the 41 card payments from abroad, NGN 14,000.00 each, every 3 minutes from 07:05 to 09:05 (fictional).
+(function () {
+  const first = ["Kofi", "Lena", "Marco", "Aisha", "Jonas", "Priya", "Tomás", "Yara", "Felix", "Nadia", "Omar", "Elena", "Kwame", "Sofia", "Ravi", "Ines", "Lukas", "Amara", "Diego", "Hana", "Mateo"];
+  const last = ["Boateng", "Fischer", "Silva", "Rahman", "Berg", "Nair", "Costa", "Haddad", "Wagner", "Petrova", "Khalil", "Rossi", "Mensah", "Lopez", "Patel", "Duarte", "Novak", "Diallo", "Moreno", "Sato"];
+  const rows = [];
+  for (let i = 0; i < 41; i++) {
+    const t = 7 * 60 + 5 + i * 3, hh = String(Math.floor(t / 60)).padStart(2, "0"), mm = String(t % 60).padStart(2, "0");
+    rows.push({ who: first[i % first.length] + " " + last[(i * 7) % last.length], via: "Card •••• " + String(1000 + ((i * 2389) % 9000)).slice(-4), amount: 14000, when: "Wed 18 Nov, " + hh + ":" + mm });
+  }
+  window.DATA.details.gadget.payout.unshift(...rows.reverse());
+})();
+
